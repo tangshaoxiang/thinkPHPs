@@ -93,7 +93,7 @@ class Sms
             "number" => $code,
             //"product" => "dsd"
         ), JSON_UNESCAPED_UNICODE));
-
+       echo $code;
         // 选填，上行短信扩展码（扩展码字段控制在7位或以下，无特殊需求用户请忽略此字段）
         $request->setSmsUpExtendCode("1234567");
 

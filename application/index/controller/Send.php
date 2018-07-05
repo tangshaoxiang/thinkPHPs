@@ -20,13 +20,13 @@ class Send
         // 生成一个随机数
         $code = rand(1000, 9999);
 
-        $taskData = [
-            'method' => 'sendSms',
-            'data' => [
-                'phone' => $phoneNum,
-                'code' => $code,
-            ]
-        ];
+//        $taskData = [
+//            'method' => 'sendSms',
+//            'data' => [
+//                'phone' => $phoneNum,
+//                'code' => $code,
+//            ]
+//        ];
 //        $_POST['http_server']->task($taskData);
 //        return Util::show(config('code.success'), 'ok');
         try {
