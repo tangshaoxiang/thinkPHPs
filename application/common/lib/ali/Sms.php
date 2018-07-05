@@ -22,7 +22,7 @@ Config::load();
  * (只需要将AK替换成开通了云通信-短信服务产品功能的AK即可)
  * 备注:Demo工程编码采用UTF-8
  */
-class SmsDemo
+class Sms
 {
 
     static $acsClient = null;
