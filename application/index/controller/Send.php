@@ -30,9 +30,11 @@ class Send
 //        $_POST['http_server']->task($taskData);
 //        return Util::show(config('code.success'), 'ok');
         try {
+            echo 111;
             $response = Sms::sendSms($phoneNum, $code);
         }catch (\Exception $e) {
             // todo
+            echo 222;
             return Util::show(config('code.error'), '阿里大于内部异常');
         }
         if($response->Code === "OK") {
@@ -45,6 +47,7 @@ class Send
 
             return Util::show(config('code.success'), 'success');
         } else {
+            return $response->Code;
             return Util::show(config('code.error'), '验证码发送失败');
         }
 

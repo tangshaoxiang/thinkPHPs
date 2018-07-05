@@ -100,6 +100,7 @@
 				$(this).html('已发送').attr('disabled', true);
 				// $.post()
 				$.get(url, function (data) {
+				    console.log(111);
 				    console.log(data);
 					// TODO: 将下面3行代码删除
 					if (data.status == 'ok') {
