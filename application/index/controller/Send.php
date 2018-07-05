@@ -35,18 +35,18 @@ class Send
             // todo
             return Util::show(config('code.error'), '阿里大于内部异常');
         }
-        //if($response->Code === "OK") {
+        if($response->Code === "OK") {
             // redis
-            /*$redis = new \Swoole\Coroutine\Redis();
+            $redis = new \Swoole\Coroutine\Redis();
             $redis->connect(config('redis.host'), config('redis.port'));
-            $redis->set(Redis::smsKey($phoneNum), $code, config('redis.out_time'));*/
+            $redis->set(Redis::smsKey($phoneNum), $code, config('redis.out_time'));
 
             // 异步redis
 
-            //return Util::show(config('code.success'), 'success');
-        //} else {
-           // return Util::show(config('code.error'), '验证码发送失败');
-        //}
+            return Util::show(config('code.success'), 'success');
+        } else {
+            return Util::show(config('code.error'), '验证码发送失败');
+        }
 
     }
 }
