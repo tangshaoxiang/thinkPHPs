@@ -30,8 +30,9 @@ class Send
 //        $_POST['http_server']->task($taskData);
 //        return Util::show(config('code.success'), 'ok');
         try {
-            echo 111;
-            $response = Sms::sendSms($phoneNum, $code);
+            echo $phoneNum;
+            echo $code;
+            $response = Sms::sendSms($phoneNum,$code);
         }catch (\Exception $e) {
             // todo
             echo 222;
