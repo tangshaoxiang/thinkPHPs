@@ -96,18 +96,18 @@
 
 			    var phone_num = $(" input[ name='phone_num' ] ").val()
 			  alert(phone_num);
-			    alert(111);
 				url = "http://192.168.241.128:8811?s=index/send/index&phone_num="+phone_num;
 				$(this).html('已发送').attr('disabled', true);
 				// $.post()
 				$.get(url, function (data) {
+				    console.log(data);
 					// TODO: 将下面3行代码删除
 					if (data.status == 'ok') {
 						alert('发送完成');
 					}
-					// if (result.status != 'ok') {
-					// 	alert('网络错误');
-					// }
+					if (result.status != 'ok') {
+						alert('网络错误');
+					}
 				});
 			});
 

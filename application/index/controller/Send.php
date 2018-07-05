@@ -16,6 +16,7 @@ class Send
             // status 0 1  message data
             return Util::show(config('code.error'), 'error');
         }
+        echo $phoneNum;return;
 
         //tood
         // 生成一个随机数
