@@ -60,9 +60,9 @@ $http->on('request', function($request, $response) use($http){
         // todo
     }
 
-    //echo "-action-".request()->action().PHP_EOL;
+    echo "-action-".request()->action().PHP_EOL;
     $res = ob_get_contents();
-    ob_end_clean();
+//    ob_end_clean();
     $response->end($res);
     //$http->close();
 });
