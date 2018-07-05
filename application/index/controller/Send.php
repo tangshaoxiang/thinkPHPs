@@ -30,12 +30,12 @@ class Send
         ];
         $_POST['http_server']->task($taskData);
         return Util::show(config('code.success'), 'ok');
-        /*try {
+        try {
             $response = Sms::sendSms($phoneNum, $code);
         }catch (\Exception $e) {
             // todo
             return Util::show(config('code.error'), '阿里大于内部异常');
-        }*/
+        }
         //if($response->Code === "OK") {
             // redis
             /*$redis = new \Swoole\Coroutine\Redis();
