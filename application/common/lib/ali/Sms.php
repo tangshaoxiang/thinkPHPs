@@ -1,5 +1,5 @@
 <?php
-
+namespace app\common\lib\ali;
 ini_set("display_errors", "on");
 
 require_once APP_PATH . '/../extend/ali/vendor/autoload.php';
