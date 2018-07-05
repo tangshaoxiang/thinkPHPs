@@ -2,7 +2,7 @@
 namespace app\common\lib\ali;
 ini_set("display_errors", "on");
 
-require_once '/../../../../extend/ali/vendor/autoload.php';
+require_once APP_PATH . '/../extend/ali/vendor/autoload.php';
 
 use Aliyun\Core\Config;
 use Aliyun\Core\Profile\DefaultProfile;
