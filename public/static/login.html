@@ -95,6 +95,8 @@
 		  $('#authCodeBtn').click(function (event) {
 
 			    var phone_num = $(" input[ name='phone_num' ] ").val()
+			  alert(phone_num);
+			    alert(111);
 				url = "http://192.168.241.128:8811?s=index/send/index&phone_num="+phone_num;
 				$(this).html('已发送').attr('disabled', true);
 				// $.post()
