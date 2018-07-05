@@ -10,7 +10,7 @@ $http = new swoole_http_server("0.0.0.0", 8811);
 $http->set(
     [
         'enable_static_handler' => true,
-        'document_root' => "/home/work/hdtocs/swoole_mooc/thinkphp/public/static",
+        'document_root' => "/home/wwwroot/default/thinkPHP5/public/static",
         'worker_num' => 5,
     ]
 );
