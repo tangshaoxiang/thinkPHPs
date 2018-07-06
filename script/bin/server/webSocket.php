@@ -8,13 +8,10 @@
 class Ws {
     CONST HOST = "0.0.0.0";
     CONST PORT = 8811;
-//    CONST CHART_PORT = 8812;
 
     public $ws = null;
     public function __construct() {
-        // 获取 key 有值 del
         $this->ws = new swoole_websocket_server(self::HOST, self::PORT);
-//        $this->ws->listen(self::HOST, self::CHART_PORT, SWOOLE_SOCK_TCP);
 
         $this->ws->set(
             [
@@ -25,7 +22,6 @@ class Ws {
             ]
         );
 
-        $this->ws->on("start", [$this, 'onStart']);
         $this->ws->on("open", [$this, 'onOpen']);
         $this->ws->on("message", [$this, 'onMessage']);
         $this->ws->on("workerstart", [$this, 'onWorkerStart']);
@@ -39,19 +35,13 @@ class Ws {
 
     /**
      * @param $server
-     */
-    public function onStart($server) {
-        swoole_set_process_name("live_master");
-    }
-    /**
-     * @param $server
      * @param $worker_id
      */
     public function onWorkerStart($server,  $worker_id) {
         // 定义应用目录
         define('APP_PATH', __DIR__ . '/../../../application/');
         // 加载框架里面的文件
-        //require __DIR__ . '/../thinkphp/base.php';
+//        require __DIR__ . '/../../../thinkphp/base.php';
         require __DIR__ . '/../../../thinkphp/start.php';
     }
 
@@ -61,11 +51,6 @@ class Ws {
      * @param $response
      */
     public function onRequest($request, $response) {
-        if($request->server['request_uri'] == '/favicon.ico') {
-            $response->status(404);
-            $response->end();
-            return ;
-        }
         $_SERVER  =  [];
         if(isset($request->server)) {
             foreach($request->server as $k => $v) {
@@ -84,12 +69,6 @@ class Ws {
                 $_GET[$k] = $v;
             }
         }
-        $_FILES = [];
-        if(isset($request->files)) {
-            foreach($request->files as $k => $v) {
-                $_FILES[$k] = $v;
-            }
-        }
         $_POST = [];
         if(isset($request->post)) {
             foreach($request->post as $k => $v) {
@@ -97,9 +76,7 @@ class Ws {
             }
         }
 
-        $this->writeLog();
         $_POST['http_server'] = $this->ws;
-
 
         ob_start();
         // 执行应用并响应
@@ -123,20 +100,25 @@ class Ws {
      * @param $data
      */
     public function onTask($serv, $taskId, $workerId, $data) {
-
         // 分发 task 任务机制，让不同的任务 走不同的逻辑
-        $obj = new app\common\lib\task\Task;
+        /**
+         * 分发task任务
+         */
+        $obj = new app\common\lib\task\Task();
 
         $method = $data['method'];
-        $flag = $obj->$method($data['data'], $serv);
-        /*$obj = new app\common\lib\ali\Sms();
-        try {
-            $response = $obj::sendSms($data['phone'], $data['code']);
-        }catch (\Exception $e) {
-            // todo
-            echo $e->getMessage();
-        }*/
+        $flag = $obj->$method($data['data']);
 
+        /**
+         * 下面为单个task任务
+         */
+//        $objSms = new app\common\lib\ali\Sms();
+//        try {
+//            $response = $objSms::sendSms($data['phone'], $data['code']);
+//        }catch (\Exception $e) {
+//            // todo
+//            echo $e->getMessage();
+//        }
         return $flag; // 告诉worker
     }
 
@@ -150,14 +132,14 @@ class Ws {
         echo "finish-data-sucess:{$data}\n";
     }
 
+
+
     /**
      * 监听ws连接事件
      * @param $ws
      * @param $request
      */
     public function onOpen($ws, $request) {
-        // fd redis [1]
-        \app\common\lib\redis\Predis::getInstance()->sAdd(config('redis.live_game_key'), $request->fd);
         var_dump($request->fd);
     }
 
@@ -170,38 +152,14 @@ class Ws {
         echo "ser-push-message:{$frame->data}\n";
         $ws->push($frame->fd, "server-push:".date("Y-m-d H:i:s"));
     }
-
     /**
      * close
      * @param $ws
      * @param $fd
      */
     public function onClose($ws, $fd) {
-        // fd del
-        \app\common\lib\redis\Predis::getInstance()->sRem(config('redis.live_game_key'), $fd);
         echo "clientid:{$fd}\n";
-    }
-
-    /**
-     * 记录日志
-     */
-    public function writeLog() {
-        $datas = array_merge(['date' => date("Ymd H:i:s")],$_GET, $_POST, $_SERVER);
-
-        $logs = "";
-        foreach($datas as $key => $value) {
-            $logs .= $key . ":" . $value . " ";
-        }
-
-        swoole_async_writefile(APP_PATH.'../runtime/log/'.date("Ym")."/".date("d")."_access.log", $logs.PHP_EOL, function($filename){
-            // todo
-        }, FILE_APPEND);
-
     }
 }
 
 new Ws();
-
-// 20台机器    agent -> spark (计算) - 》 数据库   elasticsearch  hadoop
-
-// sigterm sigusr1 usr2
