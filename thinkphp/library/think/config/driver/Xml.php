@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2006~2018 http://thinkphp.cn All rights reserved.
+// | Copyright (c) 2006~2017 http://thinkphp.cn All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
@@ -13,19 +13,12 @@ namespace think\config\driver;
 
 class Xml
 {
-    protected $config;
-
-    public function __construct($config)
+    public function parse($config)
     {
-        $this->config = $config;
-    }
-
-    public function parse()
-    {
-        if (is_file($this->config)) {
-            $content = simplexml_load_file($this->config);
+        if (is_file($config)) {
+            $content = simplexml_load_file($config);
         } else {
-            $content = simplexml_load_string($this->config);
+            $content = simplexml_load_string($config);
         }
 
         $result = (array) $content;

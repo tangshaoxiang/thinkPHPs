@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2006~2018 http://thinkphp.cn All rights reserved.
+// | Copyright (c) 2006~2017 http://thinkphp.cn All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
@@ -35,8 +35,6 @@ abstract class Relation
     protected $localKey;
     // 基础查询
     protected $baseQuery;
-    // 是否为自关联
-    protected $selfRelation;
 
     /**
      * 获取关联的所属模型
@@ -59,31 +57,9 @@ abstract class Relation
     }
 
     /**
-     * 设置当前关联为自关联
-     * @access public
-     * @param  bool $self 是否自关联
-     * @return $this
-     */
-    public function selfRelation($self = true)
-    {
-        $this->selfRelation = $self;
-        return $this;
-    }
-
-    /**
-     * 当前关联是否为自关联
-     * @access public
-     * @return bool
-     */
-    public function isSelfRelation()
-    {
-        return $this->selfRelation;
-    }
-
-    /**
      * 封装关联数据集
      * @access public
-     * @param  array $resultSet 数据集
+     * @param array $resultSet 数据集
      * @return mixed
      */
     protected function resultSetBuild($resultSet)
@@ -128,25 +104,11 @@ abstract class Relation
     }
 
     /**
-     * 删除记录
-     * @access public
-     * @param  mixed $data 表达式 true 表示强制删除
-     * @return int
-     * @throws Exception
-     * @throws PDOException
-     */
-    public function delete($data = null)
-    {
-        return $this->query->delete($data);
-    }
-
-    /**
      * 执行基础查询（仅执行一次）
      * @access protected
      * @return void
      */
-    protected function baseQuery()
-    {}
+    abstract protected function baseQuery();
 
     public function __call($method, $args)
     {
@@ -154,9 +116,7 @@ abstract class Relation
             // 执行基础查询
             $this->baseQuery();
 
-            $result = call_user_func_array([$this->query->getModel(), $method], $args);
-
-            return $result === $this->query ? $this : $result;
+            return call_user_func_array([$this->query->getModel(), $method], $args);
         } else {
             throw new Exception('method not exists:' . __CLASS__ . '->' . $method);
         }

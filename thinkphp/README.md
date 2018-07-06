@@ -1,20 +1,11 @@
-![](http://www.thinkphp.cn/Uploads/editor/2016-06-23/576b4732a6e04.png) 
-
-ThinkPHP 5.1 —— 12载初心，你值得信赖的PHP框架
+ThinkPHP 5.1RC1
 ===============
-
-[![Build Status](https://travis-ci.org/top-think/framework.svg?branch=master)](https://travis-ci.org/top-think/framework)
-[![Total Downloads](https://poser.pugx.org/topthink/framework/downloads)](https://packagist.org/packages/topthink/framework)
-[![Latest Stable Version](https://poser.pugx.org/topthink/framework/v/stable)](https://packagist.org/packages/topthink/framework)
-[![License](https://poser.pugx.org/topthink/framework/license)](https://packagist.org/packages/topthink/framework)
 
 ThinkPHP5.1对底层架构做了进一步的改进，减少依赖，其主要特性包括：
 
  + 采用容器统一管理对象
  + 支持Facade
  + 更易用的路由
- + 注解路由支持
- + 路由跨域请求支持
  + 验证类增强
  + 配置和路由目录独立
  + 取消系统常量
@@ -29,12 +20,12 @@ ThinkPHP5.1对底层架构做了进一步的改进，减少依赖，其主要特
  + 内置控制器扩展类
  + 模型自动验证
 
-> ThinkPHP5.1的运行环境要求PHP5.6+。
+> ThinkPHP5的运行环境要求PHP5.6以上。
 
 
 ## 在线手册
 
-+ [完全开发手册](https://www.kancloud.cn/manual/thinkphp5_1/content)
++ [完全开发手册](https://www.kancloud.cn/manual/thinkphp5_1)
 + [升级指导](https://www.kancloud.cn/manual/thinkphp5_1/354155) 
 
 ## 命名规范
@@ -51,7 +42,7 @@ ThinkPHP遵循Apache2开源协议发布，并提供免费使用。
 
 本项目包含的第三方源码和二进制文件之版权信息另行标注。
 
-版权所有Copyright © 2006-2018 by ThinkPHP (http://thinkphp.cn)
+版权所有Copyright © 2006-2017 by ThinkPHP (http://thinkphp.cn)
 
 All rights reserved。
 

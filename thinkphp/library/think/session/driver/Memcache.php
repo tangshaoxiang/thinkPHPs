@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2006~2018 http://thinkphp.cn All rights reserved.
+// | Copyright (c) 2006~2017 http://thinkphp.cn All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
@@ -11,10 +11,10 @@
 
 namespace think\session\driver;
 
-use SessionHandlerInterface;
+use SessionHandler;
 use think\Exception;
 
-class Memcache implements SessionHandlerInterface
+class Memcache extends SessionHandler
 {
     protected $handler = null;
     protected $config  = [
@@ -34,8 +34,8 @@ class Memcache implements SessionHandlerInterface
     /**
      * 打开Session
      * @access public
-     * @param  string    $savePath
-     * @param  mixed     $sessName
+     * @param string    $savePath
+     * @param mixed     $sessName
      */
     public function open($savePath, $sessName)
     {
@@ -81,7 +81,7 @@ class Memcache implements SessionHandlerInterface
     /**
      * 读取Session
      * @access public
-     * @param  string $sessID
+     * @param string $sessID
      */
     public function read($sessID)
     {
@@ -91,8 +91,8 @@ class Memcache implements SessionHandlerInterface
     /**
      * 写入Session
      * @access public
-     * @param  string    $sessID
-     * @param  string    $sessData
+     * @param string    $sessID
+     * @param String    $sessData
      * @return bool
      */
     public function write($sessID, $sessData)
@@ -103,7 +103,7 @@ class Memcache implements SessionHandlerInterface
     /**
      * 删除Session
      * @access public
-     * @param  string $sessID
+     * @param string $sessID
      * @return bool
      */
     public function destroy($sessID)
@@ -114,7 +114,7 @@ class Memcache implements SessionHandlerInterface
     /**
      * Session 垃圾回收
      * @access public
-     * @param  string $sessMaxLifeTime
+     * @param string $sessMaxLifeTime
      * @return true
      */
     public function gc($sessMaxLifeTime)

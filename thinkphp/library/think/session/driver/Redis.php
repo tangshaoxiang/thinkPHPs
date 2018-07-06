@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2006~2018 http://thinkphp.cn All rights reserved.
+// | Copyright (c) 2006~2017 http://thinkphp.cn All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
@@ -11,10 +11,10 @@
 
 namespace think\session\driver;
 
-use SessionHandlerInterface;
+use SessionHandler;
 use think\Exception;
 
-class Redis implements SessionHandlerInterface
+class Redis extends SessionHandler
 {
     /** @var \Redis */
     protected $handler = null;
@@ -37,38 +37,30 @@ class Redis implements SessionHandlerInterface
     /**
      * 打开Session
      * @access public
-     * @param  string $savePath
-     * @param  mixed  $sessName
+     * @param string $savePath
+     * @param mixed  $sessName
      * @return bool
      * @throws Exception
      */
     public function open($savePath, $sessName)
     {
-        if (extension_loaded('redis')) {
-            $this->handler = new \Redis;
+        // 检测php环境
+        if (!extension_loaded('redis')) {
+            throw new Exception('not support:redis');
+        }
 
-            // 建立连接
-            $func = $this->config['persistent'] ? 'pconnect' : 'connect';
-            $this->handler->$func($this->config['host'], $this->config['port'], $this->config['timeout']);
+        $this->handler = new \Redis;
 
-            if ('' != $this->config['password']) {
-                $this->handler->auth($this->config['password']);
-            }
+        // 建立连接
+        $func = $this->config['persistent'] ? 'pconnect' : 'connect';
+        $this->handler->$func($this->config['host'], $this->config['port'], $this->config['timeout']);
 
-            if (0 != $this->config['select']) {
-                $this->handler->select($this->config['select']);
-            }
-        } elseif (class_exists('\Predis\Client')) {
-            $params = [];
-            foreach ($this->config as $key => $val) {
-                if (in_array($key, ['aggregate', 'cluster', 'connections', 'exceptions', 'prefix', 'profile', 'replication'])) {
-                    $params[$key] = $val;
-                    unset($this->config[$key]);
-                }
-            }
-            $this->handler = new \Predis\Client($this->config, $params);
-        } else {
-            throw new \BadFunctionCallException('not support: redis');
+        if ('' != $this->config['password']) {
+            $this->handler->auth($this->config['password']);
+        }
+
+        if (0 != $this->config['select']) {
+            $this->handler->select($this->config['select']);
         }
 
         return true;
@@ -90,7 +82,7 @@ class Redis implements SessionHandlerInterface
     /**
      * 读取Session
      * @access public
-     * @param  string $sessID
+     * @param string $sessID
      * @return string
      */
     public function read($sessID)
@@ -101,8 +93,8 @@ class Redis implements SessionHandlerInterface
     /**
      * 写入Session
      * @access public
-     * @param  string $sessID
-     * @param  string $sessData
+     * @param string $sessID
+     * @param String $sessData
      * @return bool
      */
     public function write($sessID, $sessData)
@@ -117,7 +109,7 @@ class Redis implements SessionHandlerInterface
     /**
      * 删除Session
      * @access public
-     * @param  string $sessID
+     * @param string $sessID
      * @return bool
      */
     public function destroy($sessID)
@@ -128,50 +120,11 @@ class Redis implements SessionHandlerInterface
     /**
      * Session 垃圾回收
      * @access public
-     * @param  string $sessMaxLifeTime
+     * @param string $sessMaxLifeTime
      * @return bool
      */
     public function gc($sessMaxLifeTime)
     {
         return true;
-    }
-
-    /**
-     * Redis Session 驱动的加锁机制
-     * @access public
-     * @param  string  $sessID   用于加锁的sessID
-     * @param  integer $timeout 默认过期时间
-     * @return bool
-     */
-    public function lock($sessID, $timeout = 10)
-    {
-        if (null == $this->handler) {
-            $this->open('', '');
-        }
-
-        $lockKey = 'LOCK_PREFIX_' . $sessID;
-        // 使用setnx操作加锁
-        $isLock = $this->handler->setnx($lockKey, 1);
-        if ($isLock) {
-            // 设置过期时间，防止死任务的出现
-            $this->handler->expire($lockKey, $timeout);
-            return true;
-        }
-
-        return false;
-    }
-
-    /**
-     * Redis Session 驱动的解锁机制
-     * @access public
-     * @param  string  $sessID   用于解锁的sessID
-     */
-    public function unlock($sessID)
-    {
-        if (null == $this->handler) {
-            $this->open('', '');
-        }
-
-        $this->handler->del('LOCK_PREFIX_' . $sessID);
     }
 }

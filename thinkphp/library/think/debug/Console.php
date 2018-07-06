@@ -35,8 +35,8 @@ class Console
     /**
      * 调试输出接口
      * @access public
-     * @param  Response  $response Response对象
-     * @param  array     $log 日志信息
+     * @param Response  $response Response对象
+     * @param array     $log 日志信息
      * @return bool
      */
     public function output(Response $response, array $log = [])
@@ -133,12 +133,12 @@ JS;
                     }
                     break;
                 case '错误':
-                    $msg    = str_replace("\n", '\n', addslashes(is_scalar($m) ? $m : json_encode($m)));
+                    $msg    = str_replace("\n", '\n', $m);
                     $style  = 'color:#F4006B;font-size:14px;';
                     $line[] = "console.error(\"%c{$msg}\", \"{$style}\");";
                     break;
                 case 'sql':
-                    $msg    = str_replace("\n", '\n', addslashes($m));
+                    $msg    = str_replace("\n", '\n', $m);
                     $style  = "color:#009bb4;";
                     $line[] = "console.log(\"%c{$msg}\", \"{$style}\");";
                     break;

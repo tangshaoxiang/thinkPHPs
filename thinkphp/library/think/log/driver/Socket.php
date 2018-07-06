@@ -11,7 +11,7 @@
 
 namespace think\log\driver;
 
-use think\App;
+use think\Container;
 
 /**
  * github: https://github.com/luofei614/SocketLog
@@ -41,17 +41,14 @@ class Socket
     ];
 
     protected $allowForceClientIds = []; //配置强制推送且被授权的client_id
-    protected $app;
 
     /**
      * 架构函数
+     * @param array $config 缓存参数
      * @access public
-     * @param  array $config 缓存参数
      */
-    public function __construct(App $app, array $config = [])
+    public function __construct(array $config = [])
     {
-        $this->app = $app;
-
         if (!empty($config)) {
             $this->config = array_merge($this->config, $config);
         }
@@ -60,10 +57,10 @@ class Socket
     /**
      * 调试输出接口
      * @access public
-     * @param  array     $log 日志信息
+     * @param array     $log 日志信息
      * @return bool
      */
-    public function save(array $log = [], $append = false)
+    public function save(array $log = [])
     {
         if (!$this->check()) {
             return false;
@@ -71,11 +68,11 @@ class Socket
 
         $trace = [];
 
-        if ($this->app->isDebug()) {
-            $runtime    = round(microtime(true) - $this->app->getBeginTime(), 10);
+        if (Container::get('app')->isDebug()) {
+            $runtime    = round(microtime(true) - Container::get('app')->getBeginTime(), 10);
             $reqs       = $runtime > 0 ? number_format(1 / $runtime, 2) : '∞';
             $time_str   = ' [运行时间：' . number_format($runtime, 6) . 's][吞吐率：' . $reqs . 'req/s]';
-            $memory_use = number_format((memory_get_usage() - $this->app->getBeginMem()) / 1024, 2);
+            $memory_use = number_format((memory_get_usage() - Container::get('app')->getBeginMem()) / 1024, 2);
             $memory_str = ' [内存消耗：' . $memory_use . 'kb]';
             $file_load  = ' [文件加载：' . count(get_included_files()) . ']';
 
@@ -165,12 +162,11 @@ class Socket
 
     /**
      * 发送给指定客户端
-     * @access protected
      * @author Zjmainstay
-     * @param  $tabid
-     * @param  $client_id
-     * @param  $logs
-     * @param  $force_client_id
+     * @param $tabid
+     * @param $client_id
+     * @param $logs
+     * @param $force_client_id
      */
     protected function sendToClient($tabid, $client_id, $logs, $force_client_id)
     {
@@ -247,10 +243,9 @@ class Socket
     }
 
     /**
-     * @access protected
-     * @param  string $host - $host of socket server
-     * @param  string $message - 发送的消息
-     * @param  string $address - 地址
+     * @param string $host - $host of socket server
+     * @param string $message - 发送的消息
+     * @param string $address - 地址
      * @return bool
      */
     protected function send($host, $message = '', $address = '/')

@@ -14,8 +14,8 @@ use think\console\Command;
 use think\console\Input;
 use think\console\input\Option;
 use think\console\Output;
+use think\Container;
 use think\Db;
-use think\facade\App;
 
 class Schema extends Command
 {
@@ -33,22 +33,20 @@ class Schema extends Command
 
     protected function execute(Input $input, Output $output)
     {
-        if (!is_dir(App::getRuntimePath() . 'schema')) {
-            @mkdir(App::getRuntimePath() . 'schema', 0755, true);
+        if (!is_dir(Container::get('app')->getRuntimePath() . 'schema')) {
+            @mkdir(Container::get('app')->getRuntimePath() . 'schema', 0755, true);
         }
-
         if ($input->hasOption('module')) {
             $module = $input->getOption('module');
             // 读取模型
-            $path      = App::getAppPath() . $module . DIRECTORY_SEPARATOR . 'model';
-            $list      = is_dir($path) ? scandir($path) : [];
-            $namespace = App::getNamespace();
+            $list = scandir(Container::get('app')->getAppPath() . $module . DIRECTORY_SEPARATOR . 'model');
+            $app  = Container::get('app')->getNamespace();
 
             foreach ($list as $file) {
                 if (0 === strpos($file, '.')) {
                     continue;
                 }
-                $class = '\\' . $namespace . '\\' . $module . '\\model\\' . pathinfo($file, PATHINFO_FILENAME);
+                $class = '\\' . $app . '\\' . $module . '\\model\\' . pathinfo($file, PATHINFO_FILENAME);
                 $this->buildModelSchema($class);
             }
 
@@ -65,18 +63,15 @@ class Schema extends Command
             $dbName = $input->getOption('db');
             $tables = Db::getConnection()->getTables($dbName);
         } elseif (!\think\facade\Config::get('app_multi_module')) {
-            $namespace = App::getNamespace();
-            $path      = App::getAppPath() . 'model';
-            $list      = is_dir($path) ? scandir($path) : [];
-
+            $app  = Container::get('app')->getNamespace();
+            $list = scandir(Container::get('app')->getAppPath() . 'model');
             foreach ($list as $file) {
                 if (0 === strpos($file, '.')) {
                     continue;
                 }
-                $class = '\\' . $namespace . '\\model\\' . pathinfo($file, PATHINFO_FILENAME);
+                $class = '\\' . $app . '\\model\\' . pathinfo($file, PATHINFO_FILENAME);
                 $this->buildModelSchema($class);
             }
-
             $output->writeln('<info>Succeed!</info>');
             return;
         } else {
@@ -99,7 +94,7 @@ class Schema extends Command
             $info    = $class::getConnection()->getFields($table);
             $content .= var_export($info, true) . ';';
 
-            file_put_contents(App::getRuntimePath() . 'schema' . DIRECTORY_SEPARATOR . $dbName . '.' . $table . '.php', $content);
+            file_put_contents(Container::get('app')->getRuntimePath() . 'schema/' . $dbName . '.' . $table . '.php', $content);
         }
     }
 
@@ -115,7 +110,7 @@ class Schema extends Command
             $content = '<?php ' . PHP_EOL . 'return ';
             $info    = Db::getConnection()->getFields($db . $table);
             $content .= var_export($info, true) . ';';
-            file_put_contents(App::getRuntimePath() . 'schema' . DIRECTORY_SEPARATOR . $dbName . $table . '.php', $content);
+            file_put_contents(Container::get('app')->getRuntimePath() . 'schema' . DIRECTORY_SEPARATOR . $dbName . $table . '.php', $content);
         }
     }
 }

@@ -31,7 +31,7 @@ class Config extends Command
 
     protected function execute(Input $input, Output $output)
     {
-        if ($input->getArgument('module')) {
+        if ($input->hasArgument('module')) {
             $module = $input->getArgument('module') . DIRECTORY_SEPARATOR;
         } else {
             $module = '';
@@ -60,8 +60,7 @@ class Config extends Command
         $ext    = App::getConfigExt();
         $config = Container::get('config');
 
-        $files = is_dir($configPath) ? scandir($configPath) : [];
-
+        $files = scandir($configPath);
         foreach ($files as $file) {
             if ('.' . pathinfo($file, PATHINFO_EXTENSION) === $ext) {
                 $filename = $configPath . DIRECTORY_SEPARATOR . $file;
@@ -71,10 +70,7 @@ class Config extends Command
 
         // 加载行为扩展文件
         if (is_file($path . 'tags.php')) {
-            $tags = include $path . 'tags.php';
-            if (is_array($tags)) {
-                $content .= PHP_EOL . '\think\facade\Hook::import(' . (var_export($tags, true)) . ');' . PHP_EOL;
-            }
+            $content .= PHP_EOL . '\think\facade\Hook::import(' . (var_export(include $path . 'tags.php' ?: [], true)) . ');' . PHP_EOL;
         }
 
         // 加载公共文件
@@ -85,22 +81,8 @@ class Config extends Command
             }
         }
 
-        if ('' == $module) {
-            $content .= PHP_EOL . substr(php_strip_whitespace(App::getThinkPath() . 'helper.php'), 6) . PHP_EOL;
-
-            if (is_file($path . 'middleware.php')) {
-                $middleware = include $path . 'middleware.php';
-                if (is_array($middleware)) {
-                    $content .= PHP_EOL . '\think\Container::get("middleware")->import(' . var_export($middleware, true) . ');' . PHP_EOL;
-                }
-            }
-        }
-
         if (is_file($path . 'provider.php')) {
-            $provider = include $path . 'provider.php';
-            if (is_array($provider)) {
-                $content .= PHP_EOL . '\think\Container::getInstance()->bindTo(' . var_export($provider, true) . ');' . PHP_EOL;
-            }
+            $content .= PHP_EOL . '\think\Container::getInstance()->bind(' . var_export(include $path . 'provider.php' ?: [], true) . ');' . PHP_EOL;
         }
 
         $content .= PHP_EOL . '\think\facade\Config::set(' . var_export($config->get(), true) . ');' . PHP_EOL;

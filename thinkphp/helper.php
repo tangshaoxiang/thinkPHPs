@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2006~2018 http://thinkphp.cn All rights reserved.
+// | Copyright (c) 2006~2017 http://thinkphp.cn All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
@@ -21,16 +21,13 @@ use think\facade\Cache;
 use think\facade\Config;
 use think\facade\Cookie;
 use think\facade\Debug;
-use think\facade\Env;
 use think\facade\Hook;
 use think\facade\Lang;
 use think\facade\Log;
 use think\facade\Request;
-use think\facade\Route;
 use think\facade\Session;
 use think\facade\Url;
 use think\Response;
-use think\route\RuleItem;
 
 if (!function_exists('abort')) {
     /**
@@ -69,12 +66,11 @@ if (!function_exists('app')) {
      * 快速获取容器中的实例 支持依赖注入
      * @param string    $name 类名或标识 默认获取当前应用实例
      * @param array     $args 参数
-     * @param bool      $newInstance    是否每次创建新的实例
-     * @return mixed|\think\App
+     * @return object
      */
-    function app($name = 'think\App', $args = [], $newInstance = false)
+    function app($name = 'think\App', $args = [])
     {
-        return Container::get($name, $args, $newInstance);
+        return Container::getInstance()->make($name, $args);
     }
 }
 
@@ -101,7 +97,7 @@ if (!function_exists('bind')) {
      */
     function bind($abstract, $concrete = null)
     {
-        return Container::getInstance()->bindTo($abstract, $concrete);
+        return Container::getInstance()->bind($abstract, $concrete);
     }
 }
 
@@ -318,20 +314,6 @@ if (!function_exists('dump')) {
     }
 }
 
-if (!function_exists('env')) {
-    /**
-     * 获取环境变量值
-     * @access public
-     * @param  string    $name 环境变量名（支持二级 .号分割）
-     * @param  string    $default  默认值
-     * @return mixed
-     */
-    function env($name = null, $default = null)
-    {
-        return Env::get($name, $default);
-    }
-}
-
 if (!function_exists('exception')) {
     /**
      * 抛出异常处理
@@ -370,7 +352,7 @@ if (!function_exists('input')) {
      * @param string    $filter 过滤方法
      * @return mixed
      */
-    function input($key = '', $default = null, $filter = '')
+    function input($key = '', $default = null, $filter = null)
     {
         if (0 === strpos($key, '?')) {
             $key = substr($key, 1);
@@ -524,21 +506,6 @@ if (!function_exists('response')) {
     }
 }
 
-if (!function_exists('route')) {
-    /**
-     * 路由注册
-     * @param  string    $rule       路由规则
-     * @param  mixed     $route      路由地址
-     * @param  array     $option     路由参数
-     * @param  array     $pattern    变量规则
-     * @return RuleItem
-     */
-    function route($rule, $route, $option = [], $pattern = [])
-    {
-        return Route::rule($rule, $route, '*', $option, $pattern);
-    }
-}
-
 if (!function_exists('session')) {
     /**
      * Session管理
@@ -588,7 +555,7 @@ if (!function_exists('trace')) {
      * 记录日志信息
      * @param mixed     $log log信息 支持字符串和数组
      * @param string    $level 日志级别
-     * @return array|void
+     * @return void|array
      */
     function trace($log = '[think]', $level = 'log')
     {
@@ -652,13 +619,13 @@ if (!function_exists('view')) {
      * 渲染模板输出
      * @param string    $template 模板文件
      * @param array     $vars 模板变量
+     * @param array     $replace 模板替换
      * @param integer   $code 状态码
-     * @param callable  $filter 内容过滤
      * @return \think\response\View
      */
-    function view($template = '', $vars = [], $code = 200, $filter = null)
+    function view($template = '', $vars = [], $replace = [], $code = 200)
     {
-        return Response::create($template, 'view', $code)->assign($vars)->filter($filter);
+        return Response::create($template, 'view', $code)->replace($replace)->assign($vars);
     }
 }
 

@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2006~2018 http://thinkphp.cn All rights reserved.
+// | Copyright (c) 2006~2017 http://thinkphp.cn All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
@@ -11,7 +11,7 @@
 
 namespace think\view\driver;
 
-use think\App;
+use think\Container;
 use think\exception\TemplateNotFoundException;
 use think\Loader;
 use think\Template;
@@ -20,12 +20,8 @@ class Think
 {
     // 模板引擎实例
     private $template;
-    private $app;
-
     // 模板引擎参数
     protected $config = [
-        // 默认模板渲染规则 1 解析为小写+下划线 2 全部转换小写
-        'auto_rule'   => 1,
         // 视图基础目录（集中式）
         'view_base'   => '',
         // 模板起始路径
@@ -38,22 +34,20 @@ class Think
         'tpl_cache'   => true,
     ];
 
-    public function __construct(App $app, $config = [])
+    public function __construct($config = [])
     {
-        $this->app    = $app;
         $this->config = array_merge($this->config, (array) $config);
-
         if (empty($this->config['view_path'])) {
-            $this->config['view_path'] = $app->getModulePath() . 'view' . DIRECTORY_SEPARATOR;
+            $this->config['view_path'] = Container::get('app')->getModulePath() . 'view' . DIRECTORY_SEPARATOR;
         }
 
-        $this->template = new Template($app, $this->config);
+        $this->template = new Template($this->config);
     }
 
     /**
      * 检测是否存在模板文件
      * @access public
-     * @param  string $template 模板文件或者模板规则
+     * @param string $template 模板文件或者模板规则
      * @return bool
      */
     public function exists($template)
@@ -69,9 +63,9 @@ class Think
     /**
      * 渲染模板文件
      * @access public
-     * @param  string    $template 模板文件
-     * @param  array     $data 模板变量
-     * @param  array     $config 模板参数
+     * @param string    $template 模板文件
+     * @param array     $data 模板变量
+     * @param array     $config 模板参数
      * @return void
      */
     public function fetch($template, $data = [], $config = [])
@@ -87,7 +81,7 @@ class Think
         }
 
         // 记录视图信息
-        $this->app
+        Container::get('app')
             ->log('[ VIEW ] ' . $template . ' [ ' . var_export(array_keys($data), true) . ' ]');
 
         $this->template->fetch($template, $data, $config);
@@ -96,9 +90,9 @@ class Think
     /**
      * 渲染模板内容
      * @access public
-     * @param  string    $template 模板内容
-     * @param  array     $data 模板变量
-     * @param  array     $config 模板参数
+     * @param string    $template 模板内容
+     * @param array     $data 模板变量
+     * @param array     $config 模板参数
      * @return void
      */
     public function display($template, $data = [], $config = [])
@@ -109,13 +103,13 @@ class Think
     /**
      * 自动定位模板文件
      * @access private
-     * @param  string $template 模板文件规则
+     * @param string $template 模板文件规则
      * @return string
      */
     private function parseTemplate($template)
     {
         // 分析模板文件规则
-        $request = $this->app['request'];
+        $request = Container::get('request');
 
         // 获取视图根目录
         if (strpos($template, '@')) {
@@ -128,7 +122,7 @@ class Think
             $module = isset($module) ? $module : $request->module();
             $path   = $this->config['view_base'] . ($module ? $module . DIRECTORY_SEPARATOR : '');
         } else {
-            $path = isset($module) ? $this->app->getAppPath() . $module . DIRECTORY_SEPARATOR . 'view' . DIRECTORY_SEPARATOR : $this->config['view_path'];
+            $path = isset($module) ? Container::get('app')->getAppPath() . $module . DIRECTORY_SEPARATOR . 'view' . DIRECTORY_SEPARATOR : $this->config['view_path'];
         }
 
         $depr = $this->config['view_depr'];
@@ -136,11 +130,10 @@ class Think
         if (0 !== strpos($template, '/')) {
             $template   = str_replace(['/', ':'], $depr, $template);
             $controller = Loader::parseName($request->controller());
-
             if ($controller) {
                 if ('' == $template) {
                     // 如果模板文件名为空 按照默认规则定位
-                    $template = str_replace('.', DIRECTORY_SEPARATOR, $controller) . $depr . $this->getActionTemplate($request);
+                    $template = str_replace('.', DIRECTORY_SEPARATOR, $controller) . $depr . $request->action();
                 } elseif (false === strpos($template, $depr)) {
                     $template = str_replace('.', DIRECTORY_SEPARATOR, $controller) . $depr . $template;
                 }
@@ -152,19 +145,11 @@ class Think
         return $path . ltrim($template, '/') . '.' . ltrim($this->config['view_suffix'], '.');
     }
 
-    protected function getActionTemplate($request)
-    {
-        $rule = [$request->action(true), Loader::parseName($request->action(true)), $request->action()];
-        $type = $this->config['auto_rule'];
-
-        return isset($rule[$type]) ? $rule[$type] : $rule[0];
-    }
-
     /**
      * 配置或者获取模板引擎参数
      * @access private
-     * @param  string|array  $name 参数名
-     * @param  mixed         $value 参数值
+     * @param string|array  $name 参数名
+     * @param mixed         $value 参数值
      * @return mixed
      */
     public function config($name, $value = null)

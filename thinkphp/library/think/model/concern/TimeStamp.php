@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2006~2018 http://thinkphp.cn All rights reserved.
+// | Copyright (c) 2006~2017 http://thinkphp.cn All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
@@ -16,36 +16,21 @@ namespace think\model\concern;
  */
 trait TimeStamp
 {
-    /**
-     * 是否需要自动写入时间戳 如果设置为字符串 则表示时间字段的类型
-     * @var bool|string
-     */
+    // 是否需要自动写入时间戳 如果设置为字符串 则表示时间字段的类型
     protected $autoWriteTimestamp;
-
-    /**
-     * 创建时间字段 false表示关闭
-     * @var false|string
-     */
+    // 创建时间字段
     protected $createTime = 'create_time';
-
-    /**
-     * 更新时间字段 false表示关闭
-     * @var false|string
-     */
+    // 更新时间字段
     protected $updateTime = 'update_time';
-
-    /**
-     * 时间字段显示格式
-     * @var string
-     */
+    // 时间字段取出后的默认时间格式
     protected $dateFormat;
 
     /**
      * 时间日期字段格式化处理
-     * @access protected
-     * @param  mixed $time      时间日期表达式
-     * @param  mixed $format    日期格式
-     * @param  bool  $timestamp 是否进行时间戳转换
+     * @access public
+     * @param mixed $time      时间日期表达式
+     * @param mixed $format    日期格式
+     * @param bool  $timestamp 是否进行时间戳转换
      * @return mixed
      */
     protected function formatDateTime($time, $format, $timestamp = false)
@@ -59,11 +44,6 @@ trait TimeStamp
         return $time;
     }
 
-    /**
-     * 检查时间字段写入
-     * @access protected
-     * @return void
-     */
     protected function checkTimeStampWrite()
     {
         // 自动写入创建时间和更新时间

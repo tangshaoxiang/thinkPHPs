@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2006~2018 http://thinkphp.cn All rights reserved.
+// | Copyright (c) 2006~2017 http://thinkphp.cn All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
@@ -26,8 +26,8 @@ class Pgsql extends Builder
     /**
      * limit分析
      * @access protected
-     * @param  Query     $query        查询对象
-     * @param  mixed     $limit
+     * @param Query     $query        查询对象
+     * @param mixed     $limit
      * @return string
      */
     public function parseLimit(Query $query, $limit)
@@ -48,38 +48,26 @@ class Pgsql extends Builder
 
     /**
      * 字段和表名处理
-     * @access public
-     * @param  Query     $query     查询对象
-     * @param  mixed     $key       字段名
-     * @param  bool      $strict   严格检测
+     * @access protected
+     * @param Query     $query        查询对象
+     * @param string    $key
      * @return string
      */
-    public function parseKey(Query $query, $key, $strict = false)
+    protected function parseKey(Query $query, $key)
     {
-        if (is_numeric($key)) {
-            return $key;
-        } elseif ($key instanceof Expression) {
-            return $key->getValue();
-        }
-
         $key = trim($key);
 
-        if (strpos($key, '->') && false === strpos($key, '(')) {
+        if (strpos($key, '$.') && false === strpos($key, '(')) {
             // JSON字段支持
-            list($field, $name) = explode('->', $key);
+            list($field, $name) = explode('$.', $key);
             $key                = $field . '->>\'' . $name . '\'';
         } elseif (strpos($key, '.')) {
             list($table, $key) = explode('.', $key, 2);
-
-            $alias = $query->getOptions('alias');
-
-            if ('__TABLE__' == $table) {
-                $table = $query->getOptions('table');
-                $table = is_array($table) ? array_shift($table) : $table;
-            }
-
+            $alias             = $query->getOptions('alias');
             if (isset($alias[$table])) {
                 $table = $alias[$table];
+            } elseif ('__TABLE__' == $table) {
+                $table = $query->getTable();
             }
         }
 
@@ -93,7 +81,7 @@ class Pgsql extends Builder
     /**
      * 随机排序
      * @access protected
-     * @param  Query     $query        查询对象
+     * @param Query     $query        查询对象
      * @return string
      */
     protected function parseRand(Query $query)

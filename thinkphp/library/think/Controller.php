@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2006~2018 http://thinkphp.cn All rights reserved.
+// | Copyright (c) 2006~2017 http://thinkphp.cn All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
@@ -19,76 +19,57 @@ class Controller
     use Jump;
 
     /**
-     * 视图类实例
-     * @var \think\View
+     * @var \think\View 视图类实例
      */
     protected $view;
 
     /**
-     * Request实例
-     * @var \think\Request
+     * @var \think\Request Request实例
      */
     protected $request;
 
     /**
-     * 验证失败是否抛出异常
-     * @var bool
+     * @var \think\App 应用实例
      */
-    protected $failException = false;
+    protected $app;
 
-    /**
-     * 是否批量验证
-     * @var bool
-     */
+    // 验证失败是否抛出异常
+    protected $failException = false;
+    // 是否批量验证
     protected $batchValidate = false;
 
     /**
-     * 前置操作方法列表（即将废弃）
+     * 前置操作方法列表
      * @var array $beforeActionList
+     * @access protected
      */
     protected $beforeActionList = [];
 
     /**
-     * 控制器中间件
-     * @var array
-     */
-    protected $middleware = [];
-
-    /**
      * 构造方法
+     * @param Request $request Request对象
      * @access public
      */
-    public function __construct(App $app = null)
+    public function __construct(Request $request, App $app)
     {
-        $this->app     = $app ?: Container::get('app');
-        $this->request = $this->app['request'];
-        $this->view    = $this->app['view'];
+        $this->view = Container::get('view')->init(
+            $app['config']->pull('template'),
+            $app['config']->get('view_replace_str')
+        );
+
+        $this->request = $request;
+        $this->app     = $app;
 
         // 控制器初始化
         $this->initialize();
 
-        // 控制器中间件
-        if ($this->middleware) {
-            foreach ($this->middleware as $key => $val) {
-                if (!is_int($key)) {
-                    if (isset($val['only']) && !in_array($this->request->action(), $val['only'])) {
-                        continue;
-                    } elseif (isset($val['except']) && in_array($this->request->action(), $val['except'])) {
-                        continue;
-                    } else {
-                        $val = $key;
-                    }
-                }
-
-                $this->app['middleware']->controller($val);
+        // 前置操作方法
+        if ($this->beforeActionList) {
+            foreach ($this->beforeActionList as $method => $options) {
+                is_numeric($method) ?
+                $this->beforeAction($options) :
+                $this->beforeAction($method, $options);
             }
-        }
-
-        // 前置操作方法 即将废弃
-        foreach ((array) $this->beforeActionList as $method => $options) {
-            is_numeric($method) ?
-            $this->beforeAction($options) :
-            $this->beforeAction($method, $options);
         }
     }
 
@@ -99,8 +80,8 @@ class Controller
     /**
      * 前置操作
      * @access protected
-     * @param  string $method  前置操作方法名
-     * @param  array  $options 调用参数 ['only'=>[...]] 或者['except'=>[...]]
+     * @param string $method  前置操作方法名
+     * @param array  $options 调用参数 ['only'=>[...]] 或者['except'=>[...]]
      */
     protected function beforeAction($method, $options = [])
     {
@@ -126,34 +107,36 @@ class Controller
     /**
      * 加载模板输出
      * @access protected
-     * @param  string $template 模板文件名
-     * @param  array  $vars     模板输出变量
-     * @param  array  $config   模板参数
+     * @param string $template 模板文件名
+     * @param array  $vars     模板输出变量
+     * @param array  $replace  模板替换
+     * @param array  $config   模板参数
      * @return mixed
      */
-    protected function fetch($template = '', $vars = [], $config = [])
+    protected function fetch($template = '', $vars = [], $replace = [], $config = [])
     {
-        return $this->view->fetch($template, $vars, $config);
+        return $this->view->fetch($template, $vars, $replace, $config);
     }
 
     /**
      * 渲染内容输出
      * @access protected
-     * @param  string $content 模板内容
-     * @param  array  $vars    模板输出变量
-     * @param  array  $config  模板参数
+     * @param string $content 模板内容
+     * @param array  $vars    模板输出变量
+     * @param array  $replace 替换内容
+     * @param array  $config  模板参数
      * @return mixed
      */
-    protected function display($content = '', $vars = [], $config = [])
+    protected function display($content = '', $vars = [], $replace = [], $config = [])
     {
-        return $this->view->display($content, $vars, $config);
+        return $this->view->display($content, $vars, $replace, $config);
     }
 
     /**
      * 模板变量赋值
      * @access protected
-     * @param  mixed $name  要显示的模板变量
-     * @param  mixed $value 变量的值
+     * @param mixed $name  要显示的模板变量
+     * @param mixed $value 变量的值
      * @return $this
      */
     protected function assign($name, $value = '')
@@ -164,22 +147,9 @@ class Controller
     }
 
     /**
-     * 视图过滤
-     * @access protected
-     * @param  Callable $filter 过滤方法或闭包
-     * @return $this
-     */
-    protected function filter($filter)
-    {
-        $this->view->filter($filter);
-
-        return $this;
-    }
-
-    /**
      * 初始化模板引擎
      * @access protected
-     * @param  array|string $engine 引擎参数
+     * @param array|string $engine 引擎参数
      * @return $this
      */
     protected function engine($engine)
@@ -192,7 +162,7 @@ class Controller
     /**
      * 设置验证失败后是否抛出异常
      * @access protected
-     * @param  bool $fail 是否抛出异常
+     * @param bool $fail 是否抛出异常
      * @return $this
      */
     protected function validateFailException($fail = true)
@@ -205,11 +175,11 @@ class Controller
     /**
      * 验证数据
      * @access protected
-     * @param  array        $data     数据
-     * @param  string|array $validate 验证器名或者验证规则数组
-     * @param  array        $message  提示信息
-     * @param  bool         $batch    是否批量验证
-     * @param  mixed        $callback 回调方法（闭包）
+     * @param array        $data     数据
+     * @param string|array $validate 验证器名或者验证规则数组
+     * @param array        $message  提示信息
+     * @param bool         $batch    是否批量验证
+     * @param mixed        $callback 回调方法（闭包）
      * @return array|string|true
      * @throws ValidateException
      */
@@ -245,10 +215,11 @@ class Controller
         if (!$v->check($data)) {
             if ($this->failException) {
                 throw new ValidateException($v->getError());
+            } else {
+                return $v->getError();
             }
-            return $v->getError();
+        } else {
+            return true;
         }
-
-        return true;
     }
 }

@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2006~2018 http://thinkphp.cn All rights reserved.
+// | Copyright (c) 2006~2017 http://thinkphp.cn All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
@@ -25,14 +25,13 @@ class Sqlite extends Driver
         'prefix'     => '',
         'expire'     => 0,
         'persistent' => false,
-        'serialize'  => true,
     ];
 
     /**
      * 架构函数
-     * @access public
-     * @param  array $options 缓存参数
+     * @param array $options 缓存参数
      * @throws \BadFunctionCallException
+     * @access public
      */
     public function __construct($options = [])
     {
@@ -52,7 +51,7 @@ class Sqlite extends Driver
     /**
      * 获取实际的缓存标识
      * @access public
-     * @param  string $name 缓存名
+     * @param string $name 缓存名
      * @return string
      */
     protected function getCacheKey($name)
@@ -63,14 +62,14 @@ class Sqlite extends Driver
     /**
      * 判断缓存
      * @access public
-     * @param  string $name 缓存变量名
+     * @param string $name 缓存变量名
      * @return bool
      */
     public function has($name)
     {
         $name = $this->getCacheKey($name);
 
-        $sql    = 'SELECT value FROM ' . $this->options['table'] . ' WHERE var=\'' . $name . '\' AND (expire=0 OR expire >' . time() . ') LIMIT 1';
+        $sql    = 'SELECT value FROM ' . $this->options['table'] . ' WHERE var=\'' . $name . '\' AND (expire=0 OR expire >' . $_SERVER['REQUEST_TIME'] . ') LIMIT 1';
         $result = sqlite_query($this->handler, $sql);
 
         return sqlite_num_rows($result);
@@ -79,8 +78,8 @@ class Sqlite extends Driver
     /**
      * 读取缓存
      * @access public
-     * @param  string $name 缓存变量名
-     * @param  mixed  $default 默认值
+     * @param string $name 缓存变量名
+     * @param mixed  $default 默认值
      * @return mixed
      */
     public function get($name, $default = false)
@@ -89,7 +88,7 @@ class Sqlite extends Driver
 
         $name = $this->getCacheKey($name);
 
-        $sql = 'SELECT value FROM ' . $this->options['table'] . ' WHERE var=\'' . $name . '\' AND (expire=0 OR expire >' . time() . ') LIMIT 1';
+        $sql = 'SELECT value FROM ' . $this->options['table'] . ' WHERE var=\'' . $name . '\' AND (expire=0 OR expire >' . $_SERVER['REQUEST_TIME'] . ') LIMIT 1';
 
         $result = sqlite_query($this->handler, $sql);
 
@@ -100,7 +99,7 @@ class Sqlite extends Driver
                 $content = gzuncompress($content);
             }
 
-            return $this->unserialize($content);
+            return unserialize($content);
         }
 
         return $default;
@@ -109,9 +108,9 @@ class Sqlite extends Driver
     /**
      * 写入缓存
      * @access public
-     * @param  string            $name 缓存变量名
-     * @param  mixed             $value  存储数据
-     * @param  integer|\DateTime $expire  有效时间（秒）
+     * @param string            $name 缓存变量名
+     * @param mixed             $value  存储数据
+     * @param integer|\DateTime $expire  有效时间（秒）
      * @return boolean
      */
     public function set($name, $value, $expire = null)
@@ -120,7 +119,7 @@ class Sqlite extends Driver
 
         $name = $this->getCacheKey($name);
 
-        $value = sqlite_escape_string($this->serialize($value));
+        $value = sqlite_escape_string(serialize($value));
 
         if (is_null($expire)) {
             $expire = $this->options['expire'];
@@ -156,8 +155,8 @@ class Sqlite extends Driver
     /**
      * 自增缓存（针对数值缓存）
      * @access public
-     * @param  string    $name 缓存变量名
-     * @param  int       $step 步长
+     * @param string    $name 缓存变量名
+     * @param int       $step 步长
      * @return false|int
      */
     public function inc($name, $step = 1)
@@ -174,8 +173,8 @@ class Sqlite extends Driver
     /**
      * 自减缓存（针对数值缓存）
      * @access public
-     * @param  string    $name 缓存变量名
-     * @param  int       $step 步长
+     * @param string    $name 缓存变量名
+     * @param int       $step 步长
      * @return false|int
      */
     public function dec($name, $step = 1)
@@ -183,7 +182,7 @@ class Sqlite extends Driver
         if ($this->has($name)) {
             $value = $this->get($name) - $step;
         } else {
-            $value = -$step;
+            $value = $step;
         }
 
         return $this->set($name, $value, 0) ? $value : false;
@@ -192,7 +191,7 @@ class Sqlite extends Driver
     /**
      * 删除缓存
      * @access public
-     * @param  string $name 缓存变量名
+     * @param string $name 缓存变量名
      * @return boolean
      */
     public function rm($name)
@@ -210,7 +209,7 @@ class Sqlite extends Driver
     /**
      * 清除缓存
      * @access public
-     * @param  string $tag 标签名
+     * @param string $tag 标签名
      * @return boolean
      */
     public function clear($tag = null)

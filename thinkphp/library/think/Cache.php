@@ -2,7 +2,7 @@
 // +----------------------------------------------------------------------
 // | ThinkPHP [ WE CAN DO IT JUST THINK ]
 // +----------------------------------------------------------------------
-// | Copyright (c) 2006~2018 http://thinkphp.cn All rights reserved.
+// | Copyright (c) 2006~2017 http://thinkphp.cn All rights reserved.
 // +----------------------------------------------------------------------
 // | Licensed ( http://www.apache.org/licenses/LICENSE-2.0 )
 // +----------------------------------------------------------------------
@@ -13,61 +13,49 @@ namespace think;
 
 use think\cache\Driver;
 
-/**
- * Class Cache
- *
- * @package think
- *
- * @mixin Driver
- * @mixin \think\cache\driver\File
- */
 class Cache
 {
-    /**
-     * 缓存实例
-     * @var array
-     */
     protected $instance = [];
-
-    /**
-     * 缓存配置
-     * @var array
-     */
-    protected $config = [];
+    protected $app;
 
     /**
      * 操作句柄
      * @var object
+     * @access protected
      */
     protected $handler;
 
-    public function __construct(array $config = [])
+    public function __construct(App $app)
     {
-        $this->config = $config;
-        $this->init($config);
+        $this->app = $app;
     }
 
     /**
      * 连接缓存
      * @access public
-     * @param  array         $options  配置数组
-     * @param  bool|string   $name 缓存连接标识 true 强制重新连接
+     * @param array         $options  配置数组
+     * @param bool|string   $name 缓存连接标识 true 强制重新连接
      * @return Driver
      */
     public function connect(array $options = [], $name = false)
     {
+        $type = !empty($options['type']) ? $options['type'] : 'File';
+
         if (false === $name) {
             $name = md5(serialize($options));
         }
 
         if (true === $name || !isset($this->instance[$name])) {
-            $type = !empty($options['type']) ? $options['type'] : 'File';
+            $class = false !== strpos($type, '\\') ? $type : '\\think\\cache\\driver\\' . ucwords($type);
+
+            // 记录初始化信息
+            $this->app->log('[ CACHE ] INIT ' . $type);
 
             if (true === $name) {
                 $name = md5(serialize($options));
             }
 
-            $this->instance[$name] = Loader::factory($type, '\\think\\cache\\driver\\', $options);
+            $this->instance[$name] = new $class($options);
         }
 
         return $this->instance[$name];
@@ -76,50 +64,37 @@ class Cache
     /**
      * 自动初始化缓存
      * @access public
-     * @param  array         $options  配置数组
-     * @param  bool          $force    强制更新
+     * @param array         $options  配置数组
      * @return Driver
      */
-    public function init(array $options = [], $force = false)
+    public function init(array $options = [])
     {
-        if (is_null($this->handler) || $force) {
-
-            if ('complex' == $options['type']) {
-                $default = $options['default'];
-                $options = isset($options[$default['type']]) ? $options[$default['type']] : $default;
+        if (is_null($this->handler)) {
+            // 自动初始化缓存
+            if (!empty($options)) {
+                $connect = $this->connect($options);
+            } elseif ('complex' == $this->app['config']->get('cache.type')) {
+                $connect = $this->connect($this->app['config']->get('cache.default'));
+            } else {
+                $connect = $this->connect($this->app['config']->pull('cache'));
             }
 
-            $this->handler = $this->connect($options);
+            $this->handler = $connect;
         }
 
         return $this->handler;
     }
 
-    public static function __make(Config $config)
-    {
-        return new static($config->pull('cache'));
-    }
-
-    public function getConfig()
-    {
-        return $this->config;
-    }
-
-    public function setConfig(array $config)
-    {
-        $this->config = array_merge($this->config, $config);
-    }
-
     /**
      * 切换缓存类型 需要配置 cache.type 为 complex
      * @access public
-     * @param  string $name 缓存标识
+     * @param string $name 缓存标识
      * @return Driver
      */
     public function store($name = '')
     {
-        if ('' !== $name && 'complex' == $this->config['type']) {
-            return $this->connect($this->config[$name], strtolower($name));
+        if ('' !== $name && 'complex' == $this->app['config']->get('cache.type')) {
+            return $this->connect($this->app['config']->get('cache.' . $name), strtolower($name));
         }
 
         return $this->init();
