@@ -27,7 +27,6 @@ class Send
                 'code' => $code,
             ]
         ];
-        echo $_POST['http_server'];
         $_POST['http_server']->task($taskData);
         return Util::show(config('code.success'), 'ok');
 //        try {
