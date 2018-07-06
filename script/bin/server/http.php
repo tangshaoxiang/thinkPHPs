@@ -39,8 +39,8 @@ class Http {
         // 定义应用目录
         define('APP_PATH', __DIR__ . '/../../../application/');
         // 加载框架里面的文件
-        //require __DIR__ . '/../../../thinkphp/base.php';
-        require __DIR__ . '/../../../thinkphp/start.php';
+        require __DIR__ . '/../../../thinkphp/base.php';
+//        require __DIR__ . '/../../../thinkphp/start.php';
     }
 
     /**
