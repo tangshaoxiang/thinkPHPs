@@ -10,14 +10,13 @@ class Login
         // phone code
         $phoneNum = intval($_GET['phone_num']);
         $code = intval($_GET['code']);
-        echo $phoneNum;
-        return $code;
         if(empty($phoneNum) || empty($code)) {
             return Util::show(config('code.error'), 'phone or code is error');
         }
 
         // redis code
         try {
+            echo 111;return;
             $redisCode = Predis::getInstance()->get(Redis::smsKey($phoneNum));
         }catch (\Exception $e) {
             echo $e->getMessage();
