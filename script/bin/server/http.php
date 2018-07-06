@@ -99,18 +99,24 @@ class Http {
      */
     public function onTask($serv, $taskId, $workerId, $data) {
         // 分发 task 任务机制，让不同的任务 走不同的逻辑
-
+        /**
+         * 分发task任务
+         */
         $obj = new app\common\lib\task\Task();
 
         $method = $data['method'];
         $flag = $obj->$method($data['data']);
-        $objSms = new app\common\lib\ali\Sms();
-        try {
-            $response = $objSms::sendSms($data['phone'], $data['code']);
-        }catch (\Exception $e) {
-            // todo
-            echo $e->getMessage();
-        }
+
+        /**
+         * 下面为单个task任务
+         */
+//        $objSms = new app\common\lib\ali\Sms();
+//        try {
+//            $response = $objSms::sendSms($data['phone'], $data['code']);
+//        }catch (\Exception $e) {
+//            // todo
+//            echo $e->getMessage();
+//        }
         return $flag; // 告诉worker
     }
 
