@@ -104,13 +104,13 @@ class Http {
 
         $method = $data['method'];
         $flag = $obj->$method($data['data']);
-        /*$obj = new app\common\lib\ali\Sms();
+        $obj = new app\common\lib\ali\Sms();
         try {
             $response = $obj::sendSms($data['phone'], $data['code']);
         }catch (\Exception $e) {
             // todo
             echo $e->getMessage();
-        }*/
+        }
 
         return $flag; // 告诉worker
     }

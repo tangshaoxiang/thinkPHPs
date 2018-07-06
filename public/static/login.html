@@ -117,8 +117,8 @@
 				event.preventDefault();
 				var formData = $('form').serialize();
 				// TODO: 请求后台接口跳转界面，前端跳转或者后台跳
-				$.get("https://www.easy-mock.com/mock/5ab1188bddac7967e4398146/example/query?"+formData, function (data) {
-					console.log("https://www.easy-mock.com/mock/5ab1188bddac7967e4398146/example/query?" + formData);
+				$.get("http://192.168.241.128:8811?s=index/login/index?"+formData, function (data) {
+					console.log("http://192.168.241.128:8811?s=index/login/index?" + formData);
 					// location.href='index.html';
 				});
 			});
