@@ -8,7 +8,7 @@ namespace app\common\lib\task;
 use app\common\lib\ali\Sms;
 use app\common\lib\redis\Predis;
 use app\common\lib\Redis;
-class Task {
+class Task{
 
     /**
      * 异步发送 验证码
