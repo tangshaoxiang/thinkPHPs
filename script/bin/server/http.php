@@ -60,7 +60,7 @@ class Http {
                 $_SERVER[strtoupper($k)] = $v;
             }
         }
-          echo 1111;
+
         $_GET = [];
         if(isset($request->get)) {
             foreach($request->get as $k => $v) {
@@ -98,7 +98,6 @@ class Http {
      * @param $data
      */
     public function onTask($serv, $taskId, $workerId, $data) {
-        echo 333;
         // 分发 task 任务机制，让不同的任务 走不同的逻辑
         $obj = new app\common\lib\task\Task();
 
