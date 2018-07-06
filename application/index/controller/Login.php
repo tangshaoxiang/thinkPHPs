@@ -16,8 +16,8 @@ class Login
 
         // redis code
         try {
-            echo 111;return;
             $redisCode = Predis::getInstance()->get(Redis::smsKey($phoneNum));
+            echo $redisCode;
         }catch (\Exception $e) {
             echo $e->getMessage();
         }
