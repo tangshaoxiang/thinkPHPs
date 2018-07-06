@@ -15,7 +15,7 @@ class Task{
      * @param $data
      * @param $serv swoole server对象
      */
-    public function sendSms($data) {
+    public function sendSms($data, $serv='') {
         try {
             $response = Sms::sendSms($data['phone'], $data['code']);
         }catch (\Exception $e) {
