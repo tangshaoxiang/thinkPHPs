@@ -29,7 +29,7 @@ class Live
             'content' => !empty($_GET['content']) ? $_GET['content'] : '',
             'image' => !empty($_GET['image']) ? $_GET['image'] : '',
         ];
-        //print_r($_GET);
+        print_r($_GET);
         // 获取连接的用户
         // 赛况的基本信息入库   2、数据组织好 push到直播页面
         $taskData = [
