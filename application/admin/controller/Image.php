@@ -9,7 +9,7 @@ class Image
         $file = request()->file('file');
 //        print_r($_FILES);
         $info = $file->move(__PUBLIC__.'/static/upload');
-        print_r($info);
+        print_r($file);
         if($info) {
             $data = [
                 'image' => config('live.host')."/upload/".$info->getSaveName(),
