@@ -113,7 +113,7 @@ class Ws {
         $obj = new app\common\lib\task\Task();
 
         $method = $data['method'];
-        $flag = $obj->$method($data['data']);
+        $flag = $obj->$method($data['data'], $serv);
 
         /**
          * 下面为单个task任务
