@@ -7,7 +7,7 @@ class Image
 
     public function index() {
         $file = request()->file('file');
-        prient_r($_FILES);
+        print_r($_FILES);
         $info = $file->move(__PUBLIC__.'/static/upload');
         if($info) {
             $data = [
