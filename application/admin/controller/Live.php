@@ -14,11 +14,11 @@ class Live
         $teams = [
             1 => [
                 'name' => '马刺',
-                'logo' => '/live/imgs/team1.png',
+                'logo' => '/imgs/team1.png',
             ],
             4 => [
                 'name' => '火箭',
-                'logo' => '/live/imgs/team2.png',
+                'logo' => '/imgs/team2.png',
             ],
         ];
 

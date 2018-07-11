@@ -2,5 +2,5 @@
 
 
 return [
-    'host' => 'http://singwa.swoole.com:8811',
+    'host' => 'http://192.168.241.128:8811',
 ];
