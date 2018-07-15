@@ -84,4 +84,8 @@ class Predis {
         }
         $this->redis->$name($arguments[0], $arguments[1]);
     }
+
+    public function sAdd($key,$val){
+               return $this->redis->sAdd();
+    }
 }
