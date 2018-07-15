@@ -6,7 +6,11 @@ class Image
 {
 
     public function index() {
-        print_r($_FILES);
+        $file = request()->file('file');
+
+        $info = $file->move('../../public/static/upload');
+
+       print_r($info);
     }
 
 }
