@@ -8,7 +8,7 @@ class Image
     public function index() {
         $file = request()->file('file');
 
-        $info = $file->move('../../public/static/upload');
+        $info = $file->move('../../../public/static/upload');
 
        print_r($info);
     }
