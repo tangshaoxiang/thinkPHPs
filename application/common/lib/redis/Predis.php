@@ -86,6 +86,7 @@ class Predis {
 //    }
 
     public function sAdd($key,$val){
-               return $this->redis->sAdd($key,$val);
+        $this->set('ee','df');
+        return $this->redis->sAdd($key,$val);
     }
 }
