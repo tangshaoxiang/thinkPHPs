@@ -76,16 +76,16 @@ class Predis {
      * @param $arguments
      * @return array
      */
-    public function __call($name, $arguments) {
-        //echo $name.PHP_EOL;
-        //print_r($arguments);
-        if(count($arguments) != 2) {
-            return '';
-        }
-        $this->redis->$name($arguments[0], $arguments[1]);
-    }
+//    public function __call($name, $arguments) {
+//        //echo $name.PHP_EOL;
+//        //print_r($arguments);
+//        if(count($arguments) != 2) {
+//            return '';
+//        }
+//        $this->redis->$name($arguments[0], $arguments[1]);
+//    }
 
-    public function sAdd($key,$val){
-               return $this->redis->sAdd();
+    public function sadd($key,$val){
+               return $this->redis->sadd();
     }
 }
