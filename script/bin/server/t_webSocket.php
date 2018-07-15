@@ -146,7 +146,7 @@ class Ws {
      * @param $request
      */
     public function onOpen($ws, $request) {
-        \app\common\lib\redis\Predis::getInstance()->sadd(config('redis.live_game_key'), $request->fd);
+        \app\common\lib\redis\Predis::getInstance()->sAdd(config('redis.live_game_key'), $request->fd);
         var_dump($request->fd);
     }
 
