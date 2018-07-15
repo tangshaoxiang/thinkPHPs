@@ -7,15 +7,17 @@ class Image
 
     public function index() {
         $file = request()->file('file');
-//        print_r($_FILES);
+        print_r($_FILES);
         $info = $file->move(__PUBLIC__.'/static/upload');
-        print_r($file);
+//        print_r($file);
         if($info) {
             $data = [
                 'image' => config('live.host')."/upload/".$info->getSaveName(),
             ];
+            echo 111;
             return Util::show(config('code.success'), 'OK', $data);
         }else {
+            echo 222;
             return Util::show(config('code.error'), 'error');
         }
     }
