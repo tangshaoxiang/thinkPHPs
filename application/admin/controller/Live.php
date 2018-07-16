@@ -38,6 +38,7 @@ class Live
         ];
         $_POST['http_server']->task($taskData);
         return Util::show(config('code.success'), 'ok');
+
     }
 
 }

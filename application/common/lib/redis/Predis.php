@@ -85,8 +85,18 @@ class Predis {
 //        $this->redis->$name($arguments[0], $arguments[1]);
 //    }
 
+/**
+ * redis增加有序集合的值
+ */
     public function sAdd($key,$val){
-        $this->set('ee','df');
         return $this->redis->sAdd($key,$val);
     }
+
+    /**
+     * redis删除有序集合的值
+     */
+    public function sRem($key,$val){
+        return $this->redis->sRem($key,$val);
+    }
+
 }
