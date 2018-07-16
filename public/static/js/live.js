@@ -28,7 +28,7 @@ function push(data) {
     console.log(data);
     html = '<div class="frame">';
     html += '<h3 class="frame-header">';
-    html += '<i class="icon iconfont icon-shijian"></i>第'+data.type+'节'.date('Y-m-d');
+    html += '<i class="icon iconfont icon-shijian"></i>第'+data.type+'节';
     html += '</h3>';
     html += '<div class="frame-item">';
     html += '<span class="frame-dot"></span>';
@@ -38,7 +38,7 @@ function push(data) {
     }
     html += data.title;
     html += '</div>';
-    html += '<p><?php echo date("Y-m-d",time()) ?>+ '+data.content+'</p>';
+    html += '<p><?php echo date("Y-m-d",time()) ?>'+data.content+'</p>';
     html += '</div>';
     // html += '<div class="frame-item">';
     // html += '<span class="frame-dot"></span>';
