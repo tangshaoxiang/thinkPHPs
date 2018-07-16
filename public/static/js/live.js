@@ -39,7 +39,7 @@ function push(data) {
     html += data.title;
     html += '<p>比赛如火如荼~~~勇士必胜</p>';
     html += '<p>';
-    html += '<img src="'+data.img+'" width="40%" />';
+    html += '<img src="'+data.image+'" width="40%" />';
     html += '</p>';
     html += '</div>';
     html += '<p>'+data.content+'</p>';
