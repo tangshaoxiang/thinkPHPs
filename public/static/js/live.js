@@ -25,17 +25,20 @@ websocket.onerror = function(evt, e) {
 
 function push(data) {
     data = JSON.parse(data);
+    console.log(data);
     html = '<div class="frame">';
     html += '<h3 class="frame-header">';
-    html += '<i class="icon iconfont icon-shijian"></i>第一节 01：30';
+    html += '<i class="icon iconfont icon-shijian"></i>第'+data.type+'节'.date('Y-m-d',time());
     html += '</h3>';
     html += '<div class="frame-item">';
     html += '<span class="frame-dot"></span>';
     html += '<div class="frame-item-author">';
-    html += '<img src="./imgs/team1.png" width="20px" height="20px" /> 马刺';
+    if(data.logo){
+        html += '<img src="'+data.logo+'" width="20px" height="20px" /> data.';
+    }
+    html += data.title;
     html += '</div>';
-    html += '<p>08:44 暂停 常规暂停</p>';
-    html += '<p>08:44 帕克 犯规 个人犯规 2次</p>';
+    html += '<p><?php echo date("Y-m-d",time()) ?>+ '+data.content+'</p>';
     html += '</div>';
     // html += '<div class="frame-item">';
     // html += '<span class="frame-dot"></span>';
