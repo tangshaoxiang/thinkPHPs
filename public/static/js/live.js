@@ -28,7 +28,7 @@ function push(data) {
     console.log(data);
     html = '<div class="frame">';
     html += '<h3 class="frame-header">';
-    html += '<i class="icon iconfont icon-shijian"></i>第'+data.type+'节'.date('Y-m-d',time());
+    html += '<i class="icon iconfont icon-shijian"></i>第'+data.type+'节'.date('Y-m-d');
     html += '</h3>';
     html += '<div class="frame-item">';
     html += '<span class="frame-dot"></span>';
