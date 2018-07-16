@@ -8,11 +8,13 @@
 class Ws {
     CONST HOST = "0.0.0.0";
     CONST PORT = 8811;
+    CONST CHART_PORT = 8812;
 
     public $ws = null;
     public function __construct() {
         //需要判断redis中是否有值，若有值则需要清空
         $this->ws = new swoole_websocket_server(self::HOST, self::PORT);
+        $this->ws->listen(self::HOST, self::CHART_PORT, SWOOLE_SOCK_TCP);
         $this->ws->set(
             [
                 'enable_static_handler' => true,
@@ -146,6 +148,7 @@ class Ws {
      * @param $request
      */
     public function onOpen($ws, $request) {
+        print_r($ws);
         \app\common\lib\redis\Predis::getInstance()->sAdd(config('redis.live_game_key'), $request->fd);
         var_dump($request->fd);
     }
