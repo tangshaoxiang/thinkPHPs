@@ -29,5 +29,5 @@ function push(data) {
     html += '<span>'+data.user+'</span>';
     html += '<span>'+data.content+'</span>';
     html += '</div>';
-    $('#comments').append('qqq');
+    $('#comments').append(html);
 }
