@@ -12,6 +12,8 @@ class Chart
             $_POST['http_server']->push($fd, $fd);
         }
 
+        echo 222;
+
 
     }
 
