@@ -7,7 +7,7 @@ $(function () {
             var data = {'content':text,'game_id':1};
             $.post(url,data,function (result) {
                 //todo
-                console.log(result);
+                console.log(444);
             },'json')
         }
     })
