@@ -13,7 +13,7 @@ class Ws {
     public function __construct() {
         //需要判断redis中是否有值，若有值则需要清空
         $redis = new \Redis();
-        $redis->del(config('redis.live_game_key'));
+        $redis->del('live_game_key');
         $this->ws = new swoole_websocket_server(self::HOST, self::PORT);
 
         $this->ws->set(
