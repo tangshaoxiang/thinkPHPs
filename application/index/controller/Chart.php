@@ -5,6 +5,7 @@ class Chart
 {
     public function index()
     {
+        return 5555;
         // 登录
         if(empty($_POST['game_id'])) {
             return Util::show(config('code.error'), 'error');
