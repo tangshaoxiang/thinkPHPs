@@ -23,7 +23,7 @@ websocket.onerror = function(evt, e) {
     console.log("error:" + evt.data);
 }
 
-function push($data) {
+function push(data) {
     data = JSON.parse(data);
     html = '<div class="frame">';
     html += '<h3 class="frame-header">';
