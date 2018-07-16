@@ -99,4 +99,11 @@ class Predis {
         return $this->redis->sRem($key,$val);
     }
 
+    /**
+     * 删除key
+     */
+    public function del($key){
+        return $this->redis->del($key);
+    }
+
 }
