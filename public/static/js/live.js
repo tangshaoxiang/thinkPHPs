@@ -34,28 +34,16 @@ function push(data) {
     html += '<span class="frame-dot"></span>';
     html += '<div class="frame-item-author">';
     if(data.logo){
-        html += '<img src="'+data.logo+'" width="20px" height="20px" /> data.';
+        html += '<img src="'+data.logo+'" width="20px" height="20px" />';
     }
     html += data.title;
+    html += '<p>比赛如火如荼~~~勇士必胜</p>';
+    html += '<p>';
+    html += '<img src="'+data.img+'" width="40%" />';
+    html += '</p>';
     html += '</div>';
-    html += '<p><?php echo date("Y-m-d",time()) ?>'+data.content+'</p>';
+    html += '<p>'+data.content+'</p>';
     html += '</div>';
-    // html += '<div class="frame-item">';
-    // html += '<span class="frame-dot"></span>';
-    // html += '<div class="frame-item-author">';
-    // html += 'singwa(评论员)';
-    // html += '</div>';
-    // html += '<p>01:44 </p>';
-    // html += '<p>01:46 犯规 个人犯规 Ruan</p>';
-    // html += '</div>';
     html += '</div>';
-
     $('#match-result').prepend(html);
-
-
-
-
-
-
-
 }
