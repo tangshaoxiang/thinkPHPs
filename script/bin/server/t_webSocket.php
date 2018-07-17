@@ -24,6 +24,7 @@ class Ws {
             ]
         );
 
+        $this->ws->on("start", [$this, 'onStart']);
         $this->ws->on("open", [$this, 'onOpen']);
         $this->ws->on("message", [$this, 'onMessage']);
         $this->ws->on("workerstart", [$this, 'onWorkerStart']);
@@ -33,6 +34,14 @@ class Ws {
         $this->ws->on("close", [$this, 'onClose']);
 
         $this->ws->start();
+    }
+
+    /**
+     * 设置主进程名
+     * @param $server
+     */
+    public function onStart($server) {
+        swoole_set_process_name("live_master");
     }
 
     /**
@@ -47,12 +56,18 @@ class Ws {
         require __DIR__ . '/../../../thinkphp/start.php';
     }
 
+
     /**
      * request回调
      * @param $request
      * @param $response
      */
     public function onRequest($request, $response) {
+        if($request->server['request_uri'] == '/favicon.ico') {
+            $response->status(404);
+            $response->end();
+            return ;
+        }
         $_SERVER  =  [];
         if(isset($request->server)) {
             foreach($request->server as $k => $v) {
@@ -83,7 +98,7 @@ class Ws {
                 $_POST[$k] = $v;
             }
         }
-
+        $this->writeLog();
         $_POST['http_server'] = $this->ws;
 
         ob_start();
@@ -171,6 +186,28 @@ class Ws {
         \app\common\lib\redis\Predis::getInstance()->sRem(config('redis.live_game_key'), $fd);
         echo "clientid:{$fd}\n";
     }
+
+    /**
+     * 记录日志
+     */
+    public function writeLog() {
+        $datas = array_merge(['date' => date("Ymd H:i:s")],$_GET, $_POST, $_SERVER);
+
+        $logs = "";
+        foreach($datas as $key => $value) {
+            $logs .= $key . ":" . $value . " ";
+        }
+
+        swoole_async_writefile(APP_PATH.'../runtime/log/'.date("Ym")."/".date("d")."_access.log", $logs.PHP_EOL, function($filename){
+            // todo
+        }, FILE_APPEND);
+
+    }
 }
 
 new Ws();
+
+// 20台机器    agent -> spark (计算) - 》 数据库   elasticsearch  hadoop
+
+
+//三种信号源 sigterm sigusr1 usr2（term,usr1,usr2)

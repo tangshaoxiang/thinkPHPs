@@ -19,7 +19,7 @@ class Server {
             /// todo
             echo date("Ymd H:i:s")."error".PHP_EOL;
         } else {
-            echo date("Ymd H:i:s")."succss".PHP_EOL;
+            echo date("Ymd H:i:s")."success".PHP_EOL;
         }
     }
 }
